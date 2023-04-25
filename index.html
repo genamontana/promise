@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Promises</title>
+</head>
+
+<script>
+
+    const doAfter = (seconds) => {
+        const myPromise = new Promise((res, rej) => {
+            setTimeout(() => {
+                const randValue = Math.random()
+                res(randValue)
+            }, seconds * 1000)
+
+        });
+
+        return myPromise
+    }
+
+    doAfter(5).then(() => console.log('я сработал через 5 секунд'));
+    doAfter(3).then(() => console.log('а я сработал через 3 секунд'));
+    doAfter(10).then(() => console.log('я сработал через 10 секунд'));
+
+
+</script>
+
+</html>
