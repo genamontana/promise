@@ -10,26 +10,98 @@
 <script src="api.js"></script>
 <script>
 
+    /*
+        let msVacancies;
+        //let gVacancies;
 
-    let msPromise = api.getVacanciesCountFromMicrosoft()
-    let gPromise = api.getVacanciesCountFromGoogle()
 
-    msPromise.then(() => console.log('Microsoft finish'))
-    gPromise.then(() => console.log('Google finish'))
+         api.getVacanciesCountFromMicrosoft()
+             .then(msCount => {
+                 msVacancies = msCount
+                 return api.getVacanciesCountFromGoogle()
+             })
+             .then(gCount => {
+                 //gVacancies = gCount
+                 return api.sendStudentsCountToItKamasutra(msVacancies + gCount)
+             })
+             .then(res => {
 
-    let allPromise = Promise.all([msPromise, gPromise])
+                 console.log('from it-kamasutra: ', res.data.requestedCount)
+             })
+        */
 
-    allPromise.then((res) => {
-        let resFromMS = res[0].data.vacancies
-        let resFromG = res[1].data.vacancies
-
-        console.log('Making request to IT_KAMASUTRA')
-
-        api.sendStudentsCountToItKamasutra(resFromMS + resFromG)
-            .then(res => {
-                console.log(res.data);
+    //Это Промис версия
+    function loadVacanciesPromiseV() {
+        let msVacancies;
+        api.getVacanciesCountFromMicrosoft()
+            .then(msCount => {
+                msVacancies = msCount
+                return api.getVacanciesCountFromGoogle()
             })
-    })
+            .then(gCount => {
+                return api.sendStudentsCountToItKamasutra(msVacancies + gCount)
+            })
+            .then(res => {
+
+                console.log('from it-kamasutra: ', res.data.requestedCount)
+            })
+    }
+
+    //Это AsyncAwait версия
+    async function loadVacanciesAsyncAwaitV() {
+        let msCount = await api.getVacanciesCountFromMicrosoft()
+        let gCount = await api.getVacanciesCountFromGoogle()
+        let res = await api.sendStudentsCountToItKamasutra(msCount + gCount)
+
+        console.log('from it-kamasutra: ', res.data.requestedCount)
+    }
+
+    //Это AsyncAwait версия паралельно без await для 1-х двух запросов
+    async function loadVacanciesAsyncAwaitVParallel() {
+        let msPr = api.getVacanciesCountFromMicrosoft()
+        let gPr = api.getVacanciesCountFromGoogle()
+
+        let msGoogleResult = await Promise.all([msPr, gPr])
+
+        let res = await api.sendStudentsCountToItKamasutra(msGoogleResult[0] + msGoogleResult[1])
+        console.log('from it-kamasutra: ', res.data.requestedCount)
+    }
+
+    async function loadVacanciesAsyncAwaitVParallel2() {
+        let msGoogleResult = await Promise.all([api.getVacanciesCountFromMicrosoft(), api.getVacanciesCountFromGoogle()])
+
+        let res = await api.sendStudentsCountToItKamasutra(msGoogleResult[0] + msGoogleResult[1])
+        console.log('from it-kamasutra: ', res.data.requestedCount)
+    }
+
+    loadVacanciesPromiseV()
+    loadVacanciesAsyncAwaitV()
+    loadVacanciesAsyncAwaitVParallel()
+    loadVacanciesAsyncAwaitVParallel2()
+
+
+    /*  пример из жизни
+
+        let msPromise = api.getVacanciesCountFromMicrosoft()
+        let gPromise = api.getVacanciesCountFromGoogle()
+
+        msPromise.then(() => console.log('Microsoft finish'))
+        gPromise.then(() => console.log('Google finish'))
+
+        let allPromise = Promise.all([msPromise, gPromise])
+
+        allPromise.then((res) => {
+            let resFromMS = res[0].data.vacancies
+            let resFromG = res[1].data.vacancies
+
+            console.log('Making request to IT_KAMASUTRA')
+
+            api.sendStudentsCountToItKamasutra(resFromMS + resFromG)
+                .then(res => {
+                    console.log(res.data);
+                })
+        }).catch(() => alert('sorry reload your application'))
+    */
 
 
     /* пимеры над которорыми работади 1-ый час
